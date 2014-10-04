@@ -80,7 +80,7 @@ def getGifWord(words):
         # count the GIFs for that word
         count = getGifCount(search)
         print str(count) + " GIFs for " + search
-        if (count >= 10):
+        if (count >= 15):
             return search
         
         ++attempts
@@ -125,10 +125,9 @@ def assembleTweet():
         hear_symbols = [u"\U0001F442", u"\U0001F3A7", u"\U0001F3B5", u"\U0001F3B6", u"\U0001F3BC"]
         party_symbols = [u"\U0001F389", u"\U0001F38A", u"\U0001F355", u"\U0001F37B", u"\U0001F386"]
         
-        toTweet = "SEE " + random.choice(see_symbols) + " "
-        toTweet += gifs[0] + ", " + gifs[1] + ", " + gifs[2] + "\n"
-        toTweet += "HEAR " + random.choice(hear_symbols) + " " + track.title + "\n"
-        toTweet += "PARTY " + random.choice(party_symbols) + " " + url
+        toTweet = u"SEE %s %s, %s, %s\n" % (random.choice(see_symbols), gifs[0], gifs[1], gifs[2])
+        toTweet += u"HEAR %s %s\n" % (random.choice(hear_symbols), track.title)
+        toTweet += u"PARTY %s %s" % (random.choice(party_symbols), url)
         
         print toTweet
         
@@ -139,6 +138,8 @@ def assembleTweet():
             access_token_secret = config.access_secret)
         
         status = api.PostUpdate(toTweet)
+    except UnicodeError as e:
+        print "Unicode Error:", e.object[e.start:e.end]
     except:
         print "Error:", sys.exc_info()[0]
 
