@@ -1,0 +1,3 @@
+python-twitter==2.0
+soundcloud==0.4.1
+wordnik==2.1.2
