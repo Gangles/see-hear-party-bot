@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import blacklist
 import config
 import datetime
@@ -129,7 +130,7 @@ def assembleTweet():
         toTweet += u"HEAR %s %s\n" % (random.choice(hear_symbols), track.title)
         toTweet += u"PARTY %s %s" % (random.choice(party_symbols), url)
         
-        print toTweet
+        print toTweet.encode('ascii', 'ignore')
         
         api = twitter.Api(
             consumer_key = config.twitter_key,
