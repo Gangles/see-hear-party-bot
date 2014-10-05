@@ -1,3 +1,6 @@
+#!/usr/bin/python
+
+# API keys
 wordnik_key = 'blah'
 soundcloud_key = 'blah'
 gify_key = 'blah'
