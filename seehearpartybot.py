@@ -90,7 +90,7 @@ def getGifWord(words):
 def getGifCount(search):
     # get the total number of GIFs for this word
     url = "http://api.giphy.com/v1/gifs/search?q=" + search
-    url += "&api_key=" + config.gify_key + "&limit=3"
+    url += "&api_key=" + config.gify_key + "&limit=5"
     data = json.loads(urllib.urlopen(url).read())
     if hasAdultContent(data):
         return 0 # avoid nsfw content
@@ -98,7 +98,12 @@ def getGifCount(search):
 
 def hasAdultContent(data):
     for gif in data['data']:
-        if gif['rating'] == "r":
+        rating = gif['rating'].lower()
+        if rating.find('r') >= 0 or rating.find('nc') >= 0 or rating.find('x') >= 0:
+            return True
+        elif 'source' in gif and blacklist.isOffensive(gif['source']):
+            return True
+        elif 'username' in gif and blacklist.isOffensive(gif['username']):
             return True
     return False
 
