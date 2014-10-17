@@ -12,12 +12,14 @@ import twitter
 import urllib
 from wordnik import *
 
+recentTracks, recentGIFs = [], []
+
 def getRandomWords(wordList=[]):
     # get a list of random words from the wordnik API
     wordnik = swagger.ApiClient(config.wordnik_key, 'http://api.wordnik.com/v4')
     wordsApi = WordsApi.WordsApi(wordnik)
-    random = wordsApi.getRandomWords(includePartOfSpeech='noun', minCorpusCount=2500,
-        minDictionaryCount=15, hasDictionaryDef='true', maxLength=10)
+    random = wordsApi.getRandomWords(includePartOfSpeech='noun', minCorpusCount=2000,
+        minDictionaryCount=12, hasDictionaryDef='true', maxLength=10)
     
     assert random and len(random) > 0, "Wordnik API error"
     
@@ -30,21 +32,25 @@ def getRandomWords(wordList=[]):
 
 def getSoundCloudTracks(search):
     # get a tracks from the given search term
+    global recentTracks
     client = soundcloud.Client(client_id=config.soundcloud_key)
     tracks = client.get('/tracks', q=search, filter='streamable', genres='electronic', limit=10)
+    random.shuffle(tracks)
     
     for track in tracks:
-        if isValidTrack(track, 60):
+        if isValidTrack(track, 60, recentTracks):
             return track
     return None
 
-def isValidTrack(track, max_length):
+def isValidTrack(track, max_length, recentTracks):
     # check if we can use this track
     if blacklist.isOffensive(track.title) or blacklist.isOffensive(track.description):
         return False
     elif len(track.title) > max_length or track.duration < 60000:
         return False
     elif track.embeddable_by != "all" or track.state != "finished":
+        return False
+    elif track.title in recentTracks:
         return False
     elif track.track_type == "original" or track.track_type == "remix":
         return True
@@ -89,6 +95,9 @@ def getGifWord(words):
 
 def getGifCount(search):
     # get the total number of GIFs for this word
+    global recentGIFs
+    if search in recentGIFs:
+        return 0 # avoid repeating words
     url = "http://api.giphy.com/v1/gifs/search?q=" + search
     url += "&api_key=" + config.gify_key + "&limit=5"
     data = json.loads(urllib.urlopen(url).read())
@@ -108,16 +117,24 @@ def hasAdultContent(data):
     return False
 
 def assembleTweet():
+    global recentTracks, recentGIFs
     try:
+        while len(recentTracks) > 10:
+            recentTracks.pop(0)
+        while len(recentGIFs) > 30:
+            recentGIFs.pop(0)
+        
         words = getRandomWords()
     
         track, words = getRandomTrack(words)
         assert track, "Failed to find a track"
     
         gifs = []
-        gifs.append(getGifWord(words))
-        gifs.append(getGifWord(words))
-        gifs.append(getGifWord(words))
+        while len(gifs) < 3:
+            gifs.append(getGifWord(words))
+        
+        recentTracks.append(track.title)
+        recentGIFs.append(gifs)
         
         soundcloud_url = re.sub(r"^http", "https", track.permalink_url)
         
@@ -143,7 +160,7 @@ def assembleTweet():
             access_token_key = config.access_token,
             access_token_secret = config.access_secret)
         
-        status = api.PostUpdate(toTweet)
+        api.PostUpdate(toTweet)
     except UnicodeError as e:
         print "Unicode Error:", e.object[e.start:e.end]
     except:
