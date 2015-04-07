@@ -174,7 +174,7 @@ def waitToTweet():
     wait += (59 - now.minute) * 60
     if now.hour < 20:
         wait += (19 - now.hour) * 60 * 60
-    else
+    else:
         wait += (19 + 24 - now.hour) * 60 * 60
     print "Wait " + str(wait) + " seconds for next tweet"
     time.sleep(wait)
