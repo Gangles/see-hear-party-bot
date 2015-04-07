@@ -3,6 +3,7 @@ import blacklist
 import config
 import datetime
 import json
+import pytz
 import random
 import re
 import soundcloud
@@ -167,11 +168,14 @@ def assembleTweet():
         print "Error:", sys.exc_info()[0]
 
 def waitToTweet():
-    # tweet every 4 hours, offset by 2 hours
-    now = datetime.datetime.now()
+    # tweet once per day at 8PM pacific time
+    now = datetime.datetime.now(pytz.timezone('US/Pacific'))
     wait = 60 - now.second
     wait += (59 - now.minute) * 60
-    wait += (3 - ((now.hour + 2) % 4)) * 60 * 60;
+    if now.hour < 20:
+        wait += (19 - now.hour) * 60 * 60
+    else
+        wait += (19 + 24 - now.hour) * 60 * 60
     print "Wait " + str(wait) + " seconds for next tweet"
     time.sleep(wait)
 
