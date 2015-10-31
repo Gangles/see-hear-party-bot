@@ -3,6 +3,7 @@ import blacklist
 import config
 import datetime
 import json
+import logging
 import pytz
 import random
 import re
@@ -163,9 +164,9 @@ def assembleTweet():
         
         api.PostUpdate(toTweet)
     except UnicodeError as e:
-        print "Unicode Error:", e.object[e.start:e.end]
+        logging.exception(e.object[e.start:e.end])
     except:
-        print "Error:", sys.exc_info()[0]
+        logging.exception(sys.exc_info()[0])
 
 def waitToTweet():
     # tweet once per day at 8PM pacific time
