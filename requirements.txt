@@ -1,4 +1,4 @@
-python-twitter==2.0
+python-twitter==2.2
 pytz==2013.7
-soundcloud==0.4.1
-wordnik==2.1.2
+soundcloud==0.5.0
+wordnik==2.1.3
