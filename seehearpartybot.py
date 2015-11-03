@@ -138,13 +138,11 @@ def assembleTweet():
         recentTracks.append(track.title)
         recentGIFs.append(gifs)
         
-        soundcloud_url = re.sub(r"^http", "https", track.permalink_url)
-        
         url = "http://www.seehearparty.com/"
         url += "#g=" + urllib.quote(gifs[0])
         url += "&g=" + urllib.quote(gifs[1])
         url += "&g=" + urllib.quote(gifs[2])
-        url += "&s=" + urllib.quote(soundcloud_url, '')
+        url += "&s=" + urllib.quote(track.permalink_url, '')
         
         see_symbols = [u"\U0001F440", u"\U0001F453", u"\U0001F50E", u"\U0001F52D", u"\U0001F3A5"]
         hear_symbols = [u"\U0001F442", u"\U0001F3A7", u"\U0001F3B5", u"\U0001F3B6", u"\U0001F3BC"]
